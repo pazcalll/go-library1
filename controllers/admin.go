@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"library/models"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -32,7 +33,11 @@ func GetReturnDetail(c echo.Context) error {
 
 // MEMBER + USER
 func BookAll(c echo.Context) error {
-	return c.String(http.StatusOK, "MASTER BOOK")
+	result, err := models.BookAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, result)
 }
 
 func UserAll(c echo.Context) error {
