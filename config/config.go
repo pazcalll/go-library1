@@ -15,3 +15,5 @@ func GetConfig() Configuration {
 	gonfig.GetConf("config/config.json", &conf)
 	return conf
 }
+
+// migrate -path db/migrations -database "mysql://root:@tcp(127.0.0.1:3306)/library" up

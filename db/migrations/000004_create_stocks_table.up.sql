@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS stocks;
+
+CREATE TABLE stocks (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    book_id INT NOT NULL,
+    stock INT NOT NULL,
+    stock_max INT NOT NULL,
+
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

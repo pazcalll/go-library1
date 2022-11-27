@@ -12,7 +12,7 @@ func Init() *echo.Echo {
 	e := echo.New()
 	e.GET("/", controllers.GetUser)
 	e.GET("/stock", controllers.GetStock)
-	e.PUT("/borrow", controllers.BorrowBook)
+	e.POST("/borrow", controllers.BorrowBook)
 	e.PUT("/return", controllers.GetBorrowReport)
 	e.GET("/borrow-report", controllers.GetBorrowReport)
 	e.GET("/return-detail", controllers.GetReturnDetail)
