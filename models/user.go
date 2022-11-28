@@ -1,9 +1,12 @@
 package models
 
 import (
+	"encoding/base64"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"library/db"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -18,7 +21,11 @@ type User struct {
 	Img_url string `json:"img_url"`
 }
 
-func UserAll() (Response, error) {
+func toBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func UserAll(c echo.Context) (Response, error) {
 	var user User
 	var arrObj []User
 	var res Response
@@ -39,14 +46,37 @@ func UserAll() (Response, error) {
 			return res, err
 		}
 
+		bytes, err := ioutil.ReadFile("./" + user.Img_url)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var base64Encoding string
+
+		// Determine the content type of the image file
+		mimeType := http.DetectContentType(bytes)
+
+		// Prepend the appropriate URI scheme header depending
+		// on the MIME type
+		switch mimeType {
+		case "image/jpeg":
+			base64Encoding += "data:image/jpeg;base64,"
+		case "image/png":
+			base64Encoding += "data:image/png;base64,"
+		}
+
+		// Append the base64 encoded output
+		base64Encoding += toBase64(bytes)
+		// c.RealIP()
+
+		user.Img_url = base64Encoding
 		arrObj = append(arrObj, user)
 	}
 
+	defer rows.Close()
 	res.Status = http.StatusOK
 	res.Message = "Success"
 	res.Data = arrObj
-
-	defer rows.Close()
 	return res, nil
 }
 
@@ -58,7 +88,7 @@ func UploadUser(c echo.Context) (string, error) {
 
 	file, err := c.FormFile("img_url")
 	time_sec := time.Now().UnixNano()
-	name_str := "pics/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
+	name_str := "images/user/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
 	if err != nil {
 		return "", err
 	}

@@ -1,4 +1,4 @@
-package controllers
+package admin
 
 import (
 	"library/models"
@@ -41,7 +41,11 @@ func BookAll(c echo.Context) error {
 }
 
 func UserAll(c echo.Context) error {
-	return c.String(http.StatusOK, "MASTER USER")
+	res, err := models.UserAll(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, res)
 }
 
 func UserUpload(c echo.Context) error {

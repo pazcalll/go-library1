@@ -5,20 +5,20 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"library/controllers"
+	admin "library/controllers"
 )
 
 func Init() *echo.Echo {
 	e := echo.New()
-	e.GET("/", controllers.GetUser)
-	e.GET("/stock", controllers.GetStock)
-	e.POST("/borrow", controllers.BorrowBook)
-	e.POST("/upload", controllers.UserUpload)
-	e.PUT("/return", controllers.GetBorrowReport)
-	e.GET("/borrow-report", controllers.GetBorrowReport)
-	e.GET("/return-detail", controllers.GetReturnDetail)
-	e.GET("/book-all", controllers.BookAll)
-	e.GET("/user-all", controllers.UserAll)
+	e.GET("/", admin.GetUser)
+	e.GET("/stock", admin.GetStock)
+	e.POST("/borrow", admin.BorrowBook)
+	e.POST("/upload", admin.UserUpload)
+	e.PUT("/return", admin.GetBorrowReport)
+	e.GET("/borrow-report", admin.GetBorrowReport)
+	e.GET("/return-detail", admin.GetReturnDetail)
+	e.GET("/book-all", admin.BookAll)
+	e.GET("/user-all", admin.UserAll)
 
 	return e
 }
