@@ -21,7 +21,7 @@ func seed(s Seed, seedMethodName string) {
 	// Execute the method
 	log.Println("Seeding", seedMethodName, "...")
 	m.Call(nil)
-	log.Println("Seed", seedMethodName, "succedd")
+	log.Println("Seed", seedMethodName, "succeed")
 }
 
 // Execute will executes the given seeder method

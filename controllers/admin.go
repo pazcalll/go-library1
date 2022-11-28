@@ -31,7 +31,7 @@ func GetReturnDetail(c echo.Context) error {
 	return c.String(http.StatusOK, "RETURN DETAIL")
 }
 
-// MEMBER + USER
+// MEMBER + BOOK
 func BookAll(c echo.Context) error {
 	result, err := models.BookAll()
 	if err != nil {
@@ -42,4 +42,12 @@ func BookAll(c echo.Context) error {
 
 func UserAll(c echo.Context) error {
 	return c.String(http.StatusOK, "MASTER USER")
+}
+
+func UserUpload(c echo.Context) error {
+	res, err := models.UploadUser(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, res)
 }

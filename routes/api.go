@@ -13,6 +13,7 @@ func Init() *echo.Echo {
 	e.GET("/", controllers.GetUser)
 	e.GET("/stock", controllers.GetStock)
 	e.POST("/borrow", controllers.BorrowBook)
+	e.POST("/upload", controllers.UserUpload)
 	e.PUT("/return", controllers.GetBorrowReport)
 	e.GET("/borrow-report", controllers.GetBorrowReport)
 	e.GET("/return-detail", controllers.GetReturnDetail)

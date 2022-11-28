@@ -22,7 +22,6 @@ func BookAll() (Response, error) {
 	sqlStatement := "SELECT * FROM `books`"
 
 	rows, err := con.Query(sqlStatement)
-	defer rows.Close()
 
 	if err != nil {
 		return res, err
@@ -41,5 +40,6 @@ func BookAll() (Response, error) {
 	res.Message = "Success"
 	res.Data = arrObj
 
+	defer rows.Close()
 	return res, nil
 }
