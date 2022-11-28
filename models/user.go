@@ -18,7 +18,7 @@ import (
 type User struct {
 	Id      int    `json:"id"`
 	Name    string `json:"name"`
-	Img_url string `json:"img_url"`
+	Img_url string `json:"img_base64"`
 }
 
 func toBase64(b []byte) string {

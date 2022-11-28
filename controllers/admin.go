@@ -48,6 +48,14 @@ func UserAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+func BookUpload(c echo.Context) error {
+	res, err := models.UploadBook(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 func UserUpload(c echo.Context) error {
 	res, err := models.UploadUser(c)
 	if err != nil {
