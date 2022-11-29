@@ -12,7 +12,11 @@ func GetUser(c echo.Context) error {
 }
 
 func GetStock(c echo.Context) error {
-	return c.String(http.StatusOK, "STOK")
+	result, err := models.GetStock(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, result)
 }
 
 func BorrowBook(c echo.Context) error {

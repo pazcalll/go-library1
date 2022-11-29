@@ -7,7 +7,7 @@ func (s Seed) BookSeed() {
 		//prepare the statement
 		stmt, _ := s.db.Prepare(`INSERT INTO books(name, author, img_url) VALUES (?,?,?)`)
 		// execute query
-		_, err := stmt.Exec(faker.Sentence(), faker.Name(), "images/book/103162.png")
+		_, err := stmt.Exec(faker.Sentence(), faker.Name(), "images/book/1903162.png")
 		if err != nil {
 			panic(err)
 		}
