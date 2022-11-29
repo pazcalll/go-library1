@@ -20,7 +20,15 @@ func GetStock(c echo.Context) error {
 }
 
 func BorrowBook(c echo.Context) error {
-	return c.String(http.StatusOK, "BORROW")
+	var res models.Response
+	status, err := models.BorrowBook(c)
+	if err != nil {
+		return c.JSON(status, map[string]interface{}{"status": status, "message": err.Error()})
+	}
+	res.Data = nil
+	res.Status = 200
+	res.Message = "success"
+	return c.JSON(http.StatusOK, res)
 }
 
 func ReturnBook(c echo.Context) error {

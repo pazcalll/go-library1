@@ -9,13 +9,14 @@ import (
 type Stock struct {
 	Id       int    `json:"id"`
 	Name     string `json:"name"`
-	Stock    string `json:"stock"`
-	StockMax string `json:"stock_max"`
+	Stock    int    `json:"stock"`
+	StockMax int    `json:"stock_max"`
 }
 
+var res Response
+var s Stock
+
 func GetStock(c echo.Context) (Response, error) {
-	var res Response
-	var s Stock
 	var stocks []Stock
 
 	if c.FormValue("book_id") != "" {
