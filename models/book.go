@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -81,16 +82,20 @@ func BookAll() (Response, error) {
 func UploadBook(c echo.Context) (string, error) {
 	name := c.FormValue("name")
 	author := c.FormValue("author")
+	if name == "" || author == "" {
+		return strconv.Itoa(http.StatusBadRequest), errors.New("nama dan Author harus ada")
+	}
 	//------------
 	// Read files
 	//------------
 
-	file, err := c.FormFile("img_url")
+	file, err := c.FormFile("img")
+	if err != nil {
+		return "", errors.New("gambar harus ada")
+	}
+
 	time_sec := time.Now().UnixNano()
 	img_url_str := "images/book/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
-	if err != nil {
-		return "", err
-	}
 	src, err := file.Open()
 	if err != nil {
 		return "", err

@@ -32,7 +32,15 @@ func BorrowBook(c echo.Context) error {
 }
 
 func ReturnBook(c echo.Context) error {
-	return c.String(http.StatusOK, "RETURN")
+	var res models.Response
+	status, err := models.ReturnBook(c)
+	if err != nil {
+		return c.JSON(status, map[string]interface{}{"status": status, "message": err.Error()})
+	}
+	res.Data = nil
+	res.Status = 200
+	res.Message = "success"
+	return c.JSON(http.StatusOK, res)
 }
 
 func GetBorrowReport(c echo.Context) error {

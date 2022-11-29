@@ -18,14 +18,14 @@ type Borrow struct {
 	ReturnedAt string `json:"returned_at"`
 }
 
-type Nullabled struct {
+type NullabledBorrow struct {
 	ReturnedAt sql.NullString
 	BorrowedAt sql.NullString
 }
 
 func BorrowBook(c echo.Context) (int, error) {
 	var borrow Borrow
-	var nullabled Nullabled
+	var nullabledBorrow NullabledBorrow
 	book_id, _ := strconv.Atoi(c.FormValue("book_id"))
 	user_id, _ := strconv.Atoi(c.FormValue("user_id"))
 
@@ -33,7 +33,7 @@ func BorrowBook(c echo.Context) (int, error) {
 
 	con := db.CreateCon()
 	err := con.QueryRow(sqlStatement, book_id, user_id).
-		Scan(&borrow.Id, &borrow.UserId, &borrow.BookId, &nullabled.BorrowedAt, &nullabled.ReturnedAt)
+		Scan(&borrow.Id, &borrow.UserId, &borrow.BookId, &nullabledBorrow.BorrowedAt, &nullabledBorrow.ReturnedAt)
 
 	if err != nil {
 		// return 400, err
@@ -66,4 +66,51 @@ func DoBorrowBook(c echo.Context, con *sql.DB) (int, error) {
 		return 500, err
 	}
 	return 200, nil
+}
+
+func ReturnBook(c echo.Context) (int, error) {
+	if c.FormValue("id") == "" {
+		return http.StatusBadRequest, errors.New("ID harus diisi")
+	}
+	id, err := strconv.Atoi(c.FormValue("id"))
+	if err != nil {
+		return http.StatusBadRequest, errors.New("ID harus angka")
+	}
+
+	sqlSelect := "SELECT * FROM borrows WHERE `id` = ? LIMIT 1"
+
+	var borrow Borrow
+	var nullabledBorrow NullabledBorrow
+	con := db.CreateCon()
+	err = con.QueryRow(sqlSelect, id).
+		Scan(&borrow.Id, &borrow.UserId, &borrow.BookId, &nullabledBorrow.BorrowedAt, &nullabledBorrow.ReturnedAt)
+
+	borrow.BorrowedAt = nullabledBorrow.BorrowedAt.String
+	borrow.ReturnedAt = nullabledBorrow.ReturnedAt.String
+	if err != nil {
+		return http.StatusBadRequest, errors.New("Record peminjaman belum ada")
+	}
+
+	if nullabledBorrow.ReturnedAt.String != "" {
+		return http.StatusBadRequest, errors.New("Buku sudah dikembalikan")
+	}
+
+	if borrow.ReturnedAt == "" {
+		sqlUpdate := "UPDATE borrows SET `returned_at` = NOW() WHERE `id` = ?"
+		stmntUpdate, _ := con.Prepare(sqlUpdate)
+		_, err := stmntUpdate.Exec(id)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		sqlUpdate = "UPDATE stocks SET `stock` = CASE WHEN `stock`<`stock_max` THEN `stock`+1 ELSE `stock` END WHERE `book_id`=?"
+		stmntUpdate1, _ := con.Prepare(sqlUpdate)
+		_, err = stmntUpdate1.Exec(borrow.BookId)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+	}
+
+	return http.StatusInternalServerError, nil
+	// return http.StatusInternalServerError, c.JSON(500, borrow)
 }

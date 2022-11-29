@@ -86,7 +86,7 @@ func UploadUser(c echo.Context) (string, error) {
 	// Read files
 	//------------
 
-	file, err := c.FormFile("img_url")
+	file, err := c.FormFile("img")
 	time_sec := time.Now().UnixNano()
 	name_str := "images/user/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
 	if err != nil {
