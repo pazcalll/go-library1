@@ -14,28 +14,35 @@ type Borrow struct {
 	Id         int    `json:"id"`
 	UserId     string `json:"user_id"`
 	BookId     int    `json:"book_id"`
-	BorrowedAt int    `json:"borrowed_at"`
-	ReturnedAt int    `json:"returned_at"`
+	BorrowedAt string `json:"borrowed_at"`
+	ReturnedAt string `json:"returned_at"`
 }
 
-var borrow Borrow
+type Nullabled struct {
+	ReturnedAt sql.NullString
+	BorrowedAt sql.NullString
+}
 
 func BorrowBook(c echo.Context) (int, error) {
-	book_id := c.FormValue("book_id")
-	user_id := c.FormValue("user_id")
+	var borrow Borrow
+	var nullabled Nullabled
+	book_id, _ := strconv.Atoi(c.FormValue("book_id"))
+	user_id, _ := strconv.Atoi(c.FormValue("user_id"))
 
-	sqlStatement := "SELECT * FROM borrows WHERE book_id = ? AND user_id = ? AND returned_at = null"
+	sqlStatement := "SELECT * FROM borrows WHERE `book_id` = ? AND `user_id` = ? AND `returned_at` IS NULL LIMIT 1"
 
 	con := db.CreateCon()
 	err := con.QueryRow(sqlStatement, book_id, user_id).
-		Scan(&borrow.Id, &borrow.UserId, &borrow.BookId, &borrow.BorrowedAt, &borrow.ReturnedAt)
+		Scan(&borrow.Id, &borrow.UserId, &borrow.BookId, &nullabled.BorrowedAt, &nullabled.ReturnedAt)
 
 	if err != nil {
+		// return 400, err
 		return DoBorrowBook(c, con)
 	}
 
-	defer con.Close()
-	return 200, nil
+	// defer con.Close()
+	return http.StatusBadRequest, errors.New("User belum mengembalikan buku ini")
+	// return 400, c.JSON(http.StatusBadRequest, borrow)
 }
 
 func DoBorrowBook(c echo.Context, con *sql.DB) (int, error) {
