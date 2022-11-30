@@ -2,13 +2,14 @@ package models
 
 import (
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
 	"library/db"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -80,34 +81,41 @@ func UserAll(c echo.Context) (Response, error) {
 	return res, nil
 }
 
-func UploadUser(c echo.Context) (string, error) {
+func UploadUser(c echo.Context) (int, error) {
 	name := c.FormValue("name")
+	if name == "" {
+		return http.StatusBadRequest, errors.New("Nama tidak boleh kosong")
+	}
 	//------------
 	// Read files
 	//------------
 
 	file, err := c.FormFile("img")
+	if err != nil {
+		return http.StatusBadRequest, errors.New("File tidak boleh kosong")
+	}
+
+	if filepath.Ext(file.Filename) != ".jpg" && filepath.Ext(file.Filename) != ".jpeg" && filepath.Ext(file.Filename) != ".png" {
+		return http.StatusBadRequest, errors.New("format file harus .jpg / .png / .jpeg")
+	}
 	time_sec := time.Now().UnixNano()
 	name_str := "images/user/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
-	if err != nil {
-		return "", err
-	}
 	src, err := file.Open()
 	if err != nil {
-		return "", err
+		return http.StatusInternalServerError, err
 	}
 	defer src.Close()
 
 	// Destination
 	dst, err := os.Create(name_str)
 	if err != nil {
-		return "", err
+		return http.StatusInsufficientStorage, err
 	}
 	defer dst.Close()
 
 	// Copy
 	if _, err = io.Copy(dst, src); err != nil {
-		return "", err
+		return http.StatusInternalServerError, err
 	}
 	sqlStatement := "INSERT INTO users(`name`, `img_url`) VALUES(?, ?)"
 
@@ -119,5 +127,5 @@ func UploadUser(c echo.Context) (string, error) {
 		panic(err)
 	}
 
-	return fmt.Sprint(http.StatusOK), err
+	return http.StatusOK, err
 }

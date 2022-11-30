@@ -2,13 +2,13 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"library/db"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -79,11 +79,11 @@ func BookAll() (Response, error) {
 	return res, nil
 }
 
-func UploadBook(c echo.Context) (string, error) {
+func UploadBook(c echo.Context) (int, error) {
 	name := c.FormValue("name")
 	author := c.FormValue("author")
 	if name == "" || author == "" {
-		return strconv.Itoa(http.StatusBadRequest), errors.New("nama dan Author harus ada")
+		return http.StatusBadRequest, errors.New("nama dan Author harus ada")
 	}
 	//------------
 	// Read files
@@ -91,27 +91,31 @@ func UploadBook(c echo.Context) (string, error) {
 
 	file, err := c.FormFile("img")
 	if err != nil {
-		return "", errors.New("gambar harus ada")
+		return http.StatusBadRequest, errors.New("gambar harus ada")
+	}
+
+	if filepath.Ext(file.Filename) != ".jpg" && filepath.Ext(file.Filename) != ".jpeg" && filepath.Ext(file.Filename) != ".png" {
+		return http.StatusBadRequest, errors.New("format file harus .jpg / .png / .jpeg")
 	}
 
 	time_sec := time.Now().UnixNano()
 	img_url_str := "images/book/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
 	src, err := file.Open()
 	if err != nil {
-		return "", err
+		return http.StatusBadRequest, err
 	}
 	defer src.Close()
 
 	// Destination
 	dst, err := os.Create(img_url_str)
 	if err != nil {
-		return "", err
+		return http.StatusBadRequest, err
 	}
 	defer dst.Close()
 
 	// Copy
 	if _, err = io.Copy(dst, src); err != nil {
-		return "", err
+		return http.StatusBadRequest, err
 	}
 	sqlStatement := "INSERT INTO books(`name`, `author`, `img_url`) VALUES(?, ?, ?)"
 
@@ -123,5 +127,5 @@ func UploadBook(c echo.Context) (string, error) {
 		panic(err)
 	}
 
-	return fmt.Sprint(http.StatusOK), err
+	return http.StatusOK, err
 }

@@ -78,17 +78,17 @@ func UserAll(c echo.Context) error {
 }
 
 func BookUpload(c echo.Context) error {
-	res, err := models.UploadBook(c)
+	status, err := models.UploadBook(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return c.JSON(status, map[string]interface{}{"status": status, "message": err.Error()})
 	}
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, map[string]interface{}{"status": http.StatusOK, "message": "Success", "data": nil})
 }
 
 func UserUpload(c echo.Context) error {
-	res, err := models.UploadUser(c)
+	status, err := models.UploadUser(c)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return c.JSON(status, map[string]interface{}{"status": status, "message": err.Error()})
 	}
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, map[string]interface{}{"status": status, "message": "success", "data": nil})
 }
