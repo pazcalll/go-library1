@@ -95,8 +95,8 @@ func UploadUser(c echo.Context) (int, error) {
 		return http.StatusBadRequest, errors.New("File tidak boleh kosong")
 	}
 
-	if filepath.Ext(file.Filename) != ".jpg" && filepath.Ext(file.Filename) != ".jpeg" && filepath.Ext(file.Filename) != ".png" {
-		return http.StatusBadRequest, errors.New("format file harus .jpg / .png / .jpeg")
+	if filepath.Ext(file.Filename) != ".jpeg" && filepath.Ext(file.Filename) != ".png" {
+		return http.StatusBadRequest, errors.New("format file harus .png / .jpeg")
 	}
 	time_sec := time.Now().UnixNano()
 	name_str := "images/user/" + strconv.Itoa(int(time_sec)) + "_" + file.Filename
