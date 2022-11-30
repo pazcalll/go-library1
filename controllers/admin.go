@@ -8,7 +8,7 @@ import (
 )
 
 func GetUser(c echo.Context) error {
-	return c.String(http.StatusOK, "pong")
+	return c.String(http.StatusOK, "server on")
 }
 
 func GetStock(c echo.Context) error {
@@ -27,7 +27,7 @@ func BorrowBook(c echo.Context) error {
 	}
 	res.Data = nil
 	res.Status = 200
-	res.Message = "success"
+	res.Message = "Success"
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -39,16 +39,25 @@ func ReturnBook(c echo.Context) error {
 	}
 	res.Data = nil
 	res.Status = 200
-	res.Message = "success"
+	res.Message = "Success"
 	return c.JSON(http.StatusOK, res)
 }
 
 func GetBorrowReport(c echo.Context) error {
-	return c.String(http.StatusOK, "BORROW REPORT")
+	result, err := models.GetBorrowReport()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"status": result.Status, "message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, result)
+	// return c.String(http.StatusOK, "BORROW REPORT")
 }
 
 func GetReturnDetail(c echo.Context) error {
-	return c.String(http.StatusOK, "RETURN DETAIL")
+	result, err := models.GetReturnDetail(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{"status": result.Status, "message": err.Error()})
+	}
+	return c.JSON(http.StatusOK, result)
 }
 
 // MEMBER + BOOK
